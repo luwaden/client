@@ -3,9 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@types/react-bootstrap": "^0.32.37",
+    "@types/react-router-dom": "^5.3.3",
+    "bootstrap": "^5.3.3",
     "cra-template-typescript": "1.2.0",
     "react": "^19.0.0",
+    "react-bootstrap": "^2.10.7",
     "react-dom": "^19.0.0",
+    "react-router-dom": "^7.1.1",
     "react-scripts": "5.0.1"
   },
   "scripts": {
@@ -31,5 +36,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "axios": "^1.7.9"
   }
 }

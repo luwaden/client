@@ -1,28 +1,20 @@
-import React from "react";
-
+import { Col, Container, Navbar, NavbarBrand, Row } from "react-bootstrap";
 import "./App.css";
+import { Route, Routes } from "react-router-dom";
 import { sampleProducts } from "./data";
+
+import HomePage from "./pages/HomePage";
+import ProductPage from "./pages/ProductPage";
+import Dashboard from "./pages/Dashboard";
 
 function App() {
   return (
-    <div className='App'>
-      <h1>prox commerce</h1>
-      <main>
-        <ul>
-          {sampleProducts.map((product) => (
-            <li key={product.slug}>
-              <img
-                src={product.image}
-                alt={product.name}
-                className='product-image'
-              />
-              <h2>{product.name}</h2>
-              <p>${product.price}</p>
-            </li>
-          ))}
-        </ul>
-      </main>
-    </div>
+    <Routes>
+      <Route path='/' element={<Dashboard />}>
+        <Route index element={<HomePage />} />
+        <Route path='products' element={<ProductPage />} />
+      </Route>
+    </Routes>
   );
 }
 
