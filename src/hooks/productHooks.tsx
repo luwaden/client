@@ -3,7 +3,7 @@ import apiClient from "../ApiClients";
 import { Product } from "../types/Product";
 
 export const useGetProductsQuery = () => {
-  useQuery({
+  return useQuery({
     queryKey: ["products"],
     queryFn: async () => (await apiClient.get<Product[]>(`api/products`)).data,
   });
