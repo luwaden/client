@@ -1,15 +1,13 @@
 import React, { useEffect } from "react";
 import { Col, Container, Nav, NavbarBrand, Row } from "react-bootstrap";
-import { sampleProducts } from "../data";
-import { Navbar } from "react-bootstrap";
-import { Link, Links } from "react-router-dom";
-import { NavLink } from "react-router-dom";
 import { Product } from "../types/Product";
 import axios from "axios";
 import { getError } from "../utils";
 import { ApiError } from "../types/ApiError";
 import { LoadingBox } from "../components/LoadingBox";
 import { MessageBox } from "../components/MessageBox";
+import ProductItem from "../components/ProductItem";
+import { Helmet } from "react-helmet-async";
 
 type State = {
   products: Product[];
@@ -51,7 +49,7 @@ const HomePage = () => {
     const fetchData = async () => {
       dispatch({ type: "FETCH_REQUEST" });
       try {
-        const result = await axios.get("/api/products");
+        const result = await axios.get("http://localhost:5000/api/products");
         dispatch({ type: "FETCH_SUCCESS", payload: result.data });
       } catch (err) {
         dispatch({ type: "FETCH_ERROR", payload: getError(err as ApiError) });
@@ -66,17 +64,12 @@ const HomePage = () => {
     <MessageBox variant='danger'>{error}</MessageBox>
   ) : (
     <Row className=''>
+      <Helmet>
+        <title>Home Page</title>
+      </Helmet>
       {products.map((product) => (
         <Col key={product.slug} sm={6} md={4} lg={3}>
-          <Link to={"/products/"}>
-            <img
-              src={product.image}
-              alt={product.name}
-              className='product-image'
-            />
-            <h2>{product.name}</h2>
-            <p>${product.price}</p>
-          </Link>
+          <ProductItem product={product} />
         </Col>
       ))}
     </Row>

@@ -16,3 +16,7 @@ code {
   max-width: 400px;
   width: 100;
 }
+
+.rating span {
+  color: #ffc000;
+}
