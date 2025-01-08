@@ -1,10 +1,10 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Helmet } from "react-helmet-async";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useGetProductsDetailsBySlugQuery } from "../hooks/productHooks";
 import { LoadingBox } from "../components/LoadingBox";
 import { MessageBox } from "../components/MessageBox";
-import { getError } from "../utils";
+import { convertProductToCartItem, getError } from "../utils";
 import { ApiError } from "../types/ApiError";
 import {
   Badge,
@@ -17,6 +17,9 @@ import {
   Row,
 } from "react-bootstrap";
 import Rating from "../components/Rating";
+import { Context } from "../Context";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ProductPage = () => {
   const params = useParams();
@@ -26,6 +29,25 @@ const ProductPage = () => {
     isLoading,
     error,
   } = useGetProductsDetailsBySlugQuery(slug!);
+  const { state, dispatch } = useContext(Context);
+  const { cart } = state;
+
+  const navigate = useNavigate();
+
+  const addToCartHandler = () => {
+    const existItem = cart.cartItems.find((x) => x._id === product!._id);
+    const quantity = existItem ? existItem.quantity + 1 : 1;
+    if (product!.countInStock < quantity) {
+      toast.warn("Sorry, product is out of stock");
+      return;
+    }
+    dispatch({
+      type: "UPDATE_CART",
+      payload: { ...convertProductToCartItem(product!), quantity },
+    });
+    toast.success("product added to the cart");
+    navigate("/cart");
+  };
 
   return isLoading ? (
     <LoadingBox />
@@ -89,7 +111,9 @@ const ProductPage = () => {
                 {product.countInStock > 0 && (
                   <ListGroupItem>
                     <div className='d-grid'>
-                      <Button variant='primary'>Add to cart</Button>
+                      <Button onClick={addToCartHandler} variant='primary'>
+                        Add to cart
+                      </Button>
                     </div>
                   </ListGroupItem>
                 )}

@@ -9,7 +9,7 @@ import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { StoreProvider } from "./Store";
+import { ContextProvider } from "./Context";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -19,7 +19,7 @@ const queryClient = new QueryClient();
 
 root.render(
   <React.StrictMode>
-    <StoreProvider>
+    <ContextProvider>
       <HelmetProvider>
         <QueryClientProvider client={queryClient}>
           <BrowserRouter>
@@ -28,7 +28,7 @@ root.render(
           <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>
       </HelmetProvider>
-    </StoreProvider>
+    </ContextProvider>
   </React.StrictMode>
 );
 

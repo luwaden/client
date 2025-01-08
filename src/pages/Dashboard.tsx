@@ -1,5 +1,8 @@
 import React, { useContext, useEffect } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import {
+  Badge,
   Button,
   Col,
   Container,
@@ -8,15 +11,15 @@ import {
   NavbarBrand,
   Row,
 } from "react-bootstrap";
-import { sampleProducts } from "../data";
+
 import { Link, Outlet } from "react-router-dom";
-import { Store } from "../Store";
+import { Context } from "../Context";
 
 const Dashboard = () => {
   const {
-    state: { mode },
+    state: { mode, cart },
     dispatch,
-  } = useContext(Store);
+  } = useContext(Context);
   useEffect(() => {
     document.body.setAttribute("data-bs-theme", mode);
   });
@@ -27,18 +30,26 @@ const Dashboard = () => {
 
   return (
     <div className='d-flex flex-column vh-100'>
+      <ToastContainer position='bottom-center' limit={1} />
       <header>
         <Navbar expand='lg'>
           <Container>
-            <NavbarBrand>Prox Commerce</NavbarBrand>
+            <Link to='/'>
+              <NavbarBrand>Prox Commerce</NavbarBrand>
+            </Link>
           </Container>
           <Nav>
             <Button variant={mode} onClick={switchModeHandler}>
               <i className={mode === "light" ? "fa fa-sun" : "fa fa-moon"}></i>
             </Button>
-            <a href='/cart' className='nav-link'>
+            <Link to='/cart' className='nav-link'>
               Cart
-            </a>
+              {cart.cartItems.length > 0 && (
+                <Badge pill bg='danger'>
+                  {cart.cartItems.reduce((a, c) => a + c.quantity, 0)}
+                </Badge>
+              )}
+            </Link>
             <a href='/signin' className='nav-link'>
               Sign in
             </a>
