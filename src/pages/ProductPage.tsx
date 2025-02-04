@@ -42,7 +42,7 @@ const ProductPage = () => {
       return;
     }
     dispatch({
-      type: "UPDATE_CART",
+      type: "ADD_TO_CART",
       payload: { ...convertProductToCartItem(product!), quantity },
     });
     toast.success("product added to the cart");

@@ -9,23 +9,34 @@ import {
   Nav,
   Navbar,
   NavbarBrand,
+  NavDropdown,
   Row,
 } from "react-bootstrap";
 
-import { Link, Outlet } from "react-router-dom";
+import { Link, Navigate, Outlet, useNavigate } from "react-router-dom";
 import { Context } from "../Context";
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const {
-    state: { mode, cart },
+    state: { mode, cart, userInfo },
     dispatch,
   } = useContext(Context);
   useEffect(() => {
     document.body.setAttribute("data-bs-theme", mode);
-  });
+  }, [mode]);
 
   const switchModeHandler = () => {
     dispatch({ type: "SWITCH_MODE" });
+  };
+
+  const signoutHandler = () => {
+    dispatch({ type: "SIGNOUT_USER" });
+    localStorage.removeItem("userInfo");
+    localStorage.removeItem("cartItems");
+    localStorage.removeItem("shippingAddress");
+    localStorage.removeItem("paymentMethod");
+    navigate("/signin");
   };
 
   return (
@@ -50,12 +61,27 @@ const Dashboard = () => {
                 </Badge>
               )}
             </Link>
-            <a href='/signin' className='nav-link'>
-              Sign in
-            </a>
+            {userInfo ? (
+              <NavDropdown title={userInfo.email} id='basic-nav-dropdown'>
+                <Link
+                  to='#signout'
+                  className='dropdown-item'
+                  onClick={signoutHandler}>
+                  Sign Out
+                </Link>
+              </NavDropdown>
+            ) : (
+              <Link className='nav-Link' to='signin'>
+                Sign In
+              </Link>
+            )}
           </Nav>
         </Navbar>
       </header>
+      <hr
+        className='my-3'
+        style={{ borderTop: "3px solid black", opacity: 1 }}
+      />
       <main>
         <Container className='mt-3'>
           <Outlet />
