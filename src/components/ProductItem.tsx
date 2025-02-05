@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import { Product } from "../types/Product";
 import { Button, Card, CardBody, CardText, CardTitle } from "react-bootstrap";
 import { Link } from "react-router-dom";
@@ -8,9 +8,14 @@ import { CartItem } from "../types/Cart";
 import { convertProductToCartItem } from "../utils";
 import { toast } from "react-toastify";
 
-const ProductItem = ({ product }: { product: Product }) => {
+const ProductItem = ({
+  product,
+  isFeatured = false,
+}: {
+  product: Product;
+  isFeatured?: boolean;
+}) => {
   const { state, dispatch } = useContext(Context);
-
   const {
     cart: { cartItems },
   } = state;
@@ -19,34 +24,39 @@ const ProductItem = ({ product }: { product: Product }) => {
     const existItem = cartItems.find((x) => x._id === product._id);
     const quantity = existItem ? existItem.quantity + 1 : 1;
     if (product.countInStock < quantity) {
-      alert("Sorry. Product is out of stock");
+      toast.error("Sorry, this product is out of stock.");
       return;
     }
     dispatch({
       type: "ADD_TO_CART",
       payload: { ...item, quantity },
     });
-    toast.success("Product added to the cart");
+    toast.success("Product added to cart!");
   };
 
   return (
-    <Card>
-      <Link to={`/products/` + product.slug}>
-        <img src={product.image} className='card-img-top' alt={product.name} />
+    <Card className={`shadow-sm ${isFeatured ? "featured-product" : ""}`}>
+      <Link to={`/products/${product.slug}`}>
+        <img
+          src={product.image}
+          className='card-img-top'
+          alt={product.name}
+          style={{ height: isFeatured ? "350px" : "250px", objectFit: "cover" }}
+        />
       </Link>
       <CardBody>
-        <Link to={`/products/` + product.slug}>
-          <CardTitle>{product.name}</CardTitle>
+        <Link to={`/products/${product.slug}`}>
+          <CardTitle className='fw-bold'>{product.name}</CardTitle>
         </Link>
         <Rating rating={product.rating} numReviews={product.numReviews} />
-        <CardText>${product.price}</CardText>
+        <CardText className='fs-5 fw-semibold'>${product.price}</CardText>
         {product.countInStock === 0 ? (
-          <Button variant='light' disabled>
-            {" "}
-            out of stock
+          <Button variant='danger' disabled>
+            Out of Stock
           </Button>
         ) : (
           <Button
+            variant='primary'
             onClick={() => addToCartHandler(convertProductToCartItem(product))}>
             Add to Cart
           </Button>

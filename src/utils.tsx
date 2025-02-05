@@ -2,13 +2,18 @@ import { ApiError } from "./types/ApiError";
 import { CartItem } from "./types/Cart";
 import { Product } from "./types/Product";
 
-export const getError = (error: ApiError): string => {
-  if (error.response && error.response.data && error.response.data.message) {
-    return error.response.data.message; // Specific error message from API
+export const getError = (error: unknown): string => {
+  if (typeof error === "string") {
+    return error; // If error is already a string
   }
-  if (error.response && typeof error.response === "string") {
-    return error.response; // If response itself is a string
+
+  if (error && typeof error === "object" && "response" in error) {
+    const apiError = error as ApiError;
+    if (apiError.response?.data?.message) {
+      return apiError.response.data.message; // Extract message from API response
+    }
   }
+
   return "An unknown error occurred."; // Fallback message
 };
 

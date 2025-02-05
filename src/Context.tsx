@@ -13,7 +13,7 @@ type AppState = {
 const initialState: AppState = {
   userInfo: localStorage.getItem("userInfo")
     ? JSON.parse(localStorage.getItem("userInfo") || "{}")
-    : { token: "" },
+    : { data: "" },
   isLoading: false,
   error: null,
   mode:

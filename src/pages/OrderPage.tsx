@@ -23,7 +23,7 @@ export default function OrderPage() {
   const { id: orderId } = useParams();
 
   const token = typeof userInfo?.token === "string" ? userInfo.token : "";
-  const { order, isLoading, error, refetch } = useOrder(orderId!, token);
+  const { order, isLoading, error } = useOrder(orderId!, token);
 
   return isLoading ? (
     <LoadingBox />

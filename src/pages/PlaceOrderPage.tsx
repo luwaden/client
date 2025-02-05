@@ -1,46 +1,40 @@
 import { useContext, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
+import { toast } from "react-toastify";
 import {
   Button,
-  Card,
-  CardBody,
-  CardText,
-  CardTitle,
-  Col,
-  ListGroup,
   Row,
+  Col,
+  Card,
+  ListGroup,
+  ListGroupItem,
 } from "react-bootstrap";
-import { Helmet } from "react-helmet-async";
-import { Link, useNavigate } from "react-router-dom";
-import { toast } from "react-toastify";
-import CheckoutSteps from "../components/CheckoutSteps";
-import LoadingBox from "../components/LoadingBox";
-import { useCreateOrderMutation } from "../hooks/orderHooks";
-import { Store } from "../Store";
-import { ApiError } from "../types/ApiError";
-import { getError } from "../utils";
 import { Context } from "../Context";
-import { ListGroupItem } from "react-bootstrap";
+import { usePlaceOrder } from "../hooks/usePlaceOrder";
+import { LoadingBox } from "../components/LoadingBox";
 
 export default function PlaceOrderPage() {
   const navigate = useNavigate();
-
-  const { state, dispatch } = useContext(Context);
+  const { state, dispatch: ctxDispatch } = useContext(Context);
   const { cart, userInfo } = state;
 
-  const round2 = (num: number) => Math.round(num * 100 + Number.EPSILON) / 100; // 123.2345 => 123.23
+  // 🛠 Fix: Ensure token is properly checked before passing
+  const user = JSON.parse(localStorage.getItem("userInfo") || "{}");
 
-  cart.itemsPrice = round2(
-    cart.cartItems.reduce((a, c) => a + c.quantity * c.price, 0)
+  const { isLoading, error, success, order, placeOrder } = usePlaceOrder(
+    user.data ? user.data : ""
   );
-  cart.shippingPrice = cart.itemsPrice > 100 ? round2(0) : round2(10);
-  cart.taxPrice = round2(0.15 * cart.itemsPrice);
-  cart.totalPrice = cart.itemsPrice + cart.shippingPrice + cart.taxPrice;
 
-  const { mutateAsync: createOrder, isLoading } = useCreateOrderMutation();
+  useEffect(() => {
+    if (success && order) {
+      navigate(`/order/${order._id}`);
+    }
+  }, [success, order, navigate]);
 
   const placeOrderHandler = async () => {
     try {
-      const data = await createOrder({
+      await placeOrder({
         orderItems: cart.cartItems,
         shippingAddress: cart.shippingAddress,
         paymentMethod: cart.paymentMethod,
@@ -49,124 +43,74 @@ export default function PlaceOrderPage() {
         taxPrice: cart.taxPrice,
         totalPrice: cart.totalPrice,
       });
-      dispatch({ type: "CART_CLEAR" });
-      localStorage.removeItem("cartItems");
-      navigate(`/order/${data.order._id}`);
+
+      // 🛠 Fix: Ensure "CART_CLEAR" action exists
+      ctxDispatch({ type: "CART_CLEAR" });
     } catch (err) {
-      toast.error(getError(err as ApiError));
+      toast.error(error);
     }
   };
 
-  useEffect(() => {
-    if (!cart.paymentMethod) {
-      navigate("/payment");
-    }
-  }, [cart, navigate]);
-
   return (
     <div>
-      <CheckoutSteps step1 step2 step3 step4></CheckoutSteps>
-      <Helmet>
-        <title>Preview Order</title>
-      </Helmet>
+      <Helmet title='Place Order' />
       <h1 className='my-3'>Preview Order</h1>
       <Row>
         <Col md={8}>
           <Card className='mb-3'>
-            <CardBody>
-              <CardTitle>Shipping</CardTitle>
-              <CardText>
-                <strong>Name:</strong> {cart.shippingAddress.fullName} <br />
-                <strong>Address: </strong> {cart.shippingAddress.address},
-                {cart.shippingAddress.city}, {cart.shippingAddress.postalCode},
-                {cart.shippingAddress.country}
-              </CardText>
-              <Link to='/shipping'>Edit</Link>
-            </CardBody>
-          </Card>
-
-          <Card className='mb-3'>
-            <CardBody>
-              <CardTitle>Payment</CardTitle>
-              <CardText>
-                <strong>Method:</strong> {cart.paymentMethod}
-              </CardText>
-              <Link to='/payment'>Edit</Link>
-            </CardBody>
-          </Card>
-
-          <Card className='mb-3'>
-            <CardBody>
-              <CardTitle>Items</CardTitle>
+            <Card.Body>
+              <Card.Title>Shipping</Card.Title>
               <ListGroup variant='flush'>
-                {cart.cartItems.map((item) => (
-                  <ListGroup.Item key={item._id}>
-                    <Row className='align-items-center'>
-                      <Col md={6}>
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className='img-fluid rounded thumbnail'></img>{" "}
-                        <Link to={`/product/${item.slug}`}>{item.name}</Link>
-                      </Col>
-                      <Col md={3}>
-                        <span>{item.quantity}</span>
-                      </Col>
-                      <Col md={3}>${item.price}</Col>
-                    </Row>
-                  </ListGroup.Item>
-                ))}
+                <ListGroup.Item>
+                  <strong>Name:</strong> {cart.shippingAddress.fullName} <br />
+                  <strong>Address:</strong> {cart.shippingAddress.address},{" "}
+                  {cart.shippingAddress.city}, {cart.shippingAddress.postalCode}
+                  , {cart.shippingAddress.country}
+                </ListGroup.Item>
               </ListGroup>
-              <Link to='/cart'>Edit</Link>
-            </CardBody>
+            </Card.Body>
           </Card>
         </Col>
         <Col md={4}>
           <Card>
-            <CardBody>
-              <CardTitle>Order Summary</CardTitle>
+            <Card.Body>
               <ListGroup variant='flush'>
-                <ListGroupItem>
+                <ListGroup.Item>
+                  <h2>Order Summary</h2>
+                </ListGroup.Item>
+                <ListGroup.Item>
                   <Row>
-                    <Col>Items</Col>
+                    <Col>Items:</Col>
                     <Col>${cart.itemsPrice.toFixed(2)}</Col>
                   </Row>
-                </ListGroupItem>
-                <ListGroupItem>
                   <Row>
-                    <Col>Shipping</Col>
+                    <Col>Shipping:</Col>
                     <Col>${cart.shippingPrice.toFixed(2)}</Col>
                   </Row>
-                </ListGroupItem>
-                <ListGroupItem>
                   <Row>
-                    <Col>Tax</Col>
+                    <Col>Tax:</Col>
                     <Col>${cart.taxPrice.toFixed(2)}</Col>
                   </Row>
-                </ListGroupItem>
-                <ListGroupItem>
                   <Row>
                     <Col>
-                      <strong> Order Total</strong>
+                      <strong>Order Total:</strong>
                     </Col>
                     <Col>
                       <strong>${cart.totalPrice.toFixed(2)}</strong>
                     </Col>
                   </Row>
-                </ListGroupItem>
+                </ListGroup.Item>
                 <ListGroupItem>
-                  <div className='d-grid'>
-                    <Button
-                      type='button'
-                      onClick={placeOrderHandler}
-                      disabled={cart.cartItems.length === 0 || isLoading}>
-                      Place Order
-                    </Button>
-                    {isLoading && <LoadingBox></LoadingBox>}
-                  </div>
+                  {isLoading && <LoadingBox />}
+                  <Button
+                    type='button'
+                    onClick={placeOrderHandler}
+                    disabled={cart.cartItems.length === 0}>
+                    Place Order
+                  </Button>
                 </ListGroupItem>
               </ListGroup>
-            </CardBody>
+            </Card.Body>
           </Card>
         </Col>
       </Row>

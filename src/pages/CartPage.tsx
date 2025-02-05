@@ -46,10 +46,8 @@ const CartPage: React.FC = () => {
 
   return (
     <div>
-      <Helmet>
-        {" "}
-        <title>Shopping Cart</title>
-      </Helmet>
+      {/* <Helmet title="">
+      </Helmet> */}
       <h1>Shopping Cart</h1>
       <Row>
         <Col md={8}>

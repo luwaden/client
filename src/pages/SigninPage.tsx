@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Context } from "../Context";
-import { useSignin } from "../hooks/userHooks"; // Updated import
+import { useSignin } from "../hooks/userSignin"; // Updated import
 import { ApiError } from "../types/ApiError";
 import { toast } from "react-toastify";
 import { getError } from "../utils";
@@ -49,9 +49,9 @@ const SigninPage = () => {
 
   return (
     <Container className='small-container'>
-      <Helmet>
-        <title>Sign In</title>
-      </Helmet>
+      {/* <Helmet>
+        <title>{'Sign In'}</title>
+      </Helmet> */}
       <h1 className='my-3'> Sign In</h1>
       {error && <div className='error'>{getError(error)}</div>}{" "}
       {/* Display error message */}

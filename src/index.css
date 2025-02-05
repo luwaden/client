@@ -41,3 +41,9 @@ img.thumbnail {
   border-bottom: 0.2rem solid #fab300;
   color: #fab300;
 }
+
+.featured-product {
+  border: 3px solid gold;
+  background: #f8f9fa;
+  padding: 10px;
+}
