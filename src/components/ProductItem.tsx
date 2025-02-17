@@ -3,7 +3,7 @@ import { Product } from "../types/Product";
 import { Button, Card, CardBody, CardText, CardTitle } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import Rating from "./Rating";
-import { Context } from "../Context";
+import { Context } from "../ContextApi/AppContext";
 import { CartItem } from "../types/Cart";
 import { convertProductToCartItem } from "../utils";
 import { toast } from "react-toastify";

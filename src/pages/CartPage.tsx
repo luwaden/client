@@ -1,8 +1,7 @@
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Context } from "../Context";
+import { Context } from "../ContextApi/AppContext";
 import { CartItem } from "../types/Cart";
-import { toast } from "react-toastify";
 import { Helmet } from "react-helmet-async";
 import {
   Button,
@@ -14,6 +13,7 @@ import {
   Row,
 } from "react-bootstrap";
 import { MessageBox } from "../components/MessageBox";
+import { useCart } from "../hooks/cartHook";
 
 const CartPage: React.FC = () => {
   const navigate = useNavigate();
@@ -22,32 +22,32 @@ const CartPage: React.FC = () => {
       mode,
       cart: { cartItems },
     },
-    dispatch,
   } = useContext(Context);
 
+  const { fetchCart, updateCart, removeFromCart } = useCart();
+
+  useEffect(() => {
+    fetchCart();
+  }, []);
+
   const updateCartHandler = (item: CartItem, quantity: number) => {
-    if (item.countInStock < quantity) {
-      toast.warn("Sorry, Product is out of stock");
-      return;
-    }
-    dispatch({
-      type: "ADD_TO_CART",
-      payload: { ...item, quantity },
-    });
+    if (quantity < 1) return removeFromCart(item._id);
+    updateCart(item._id, quantity);
+  };
+
+  const removeItemHandler = (item: CartItem) => {
+    removeFromCart(item._id);
   };
 
   const checkoutHandler = () => {
-    navigate("signin?/redirect=/shipping");
-  };
-
-  const removeItemHandler = (Item: CartItem) => {
-    dispatch({ type: "REMOVE_FROM_CART", payload: Item });
+    navigate("/shipping");
   };
 
   return (
     <div>
-      {/* <Helmet title="">
-      </Helmet> */}
+      <Helmet>
+        <title>Shopping Cart</title>
+      </Helmet>
       <h1>Shopping Cart</h1>
       <Row>
         <Col md={8}>
@@ -80,10 +80,10 @@ const CartPage: React.FC = () => {
                       </Button>{" "}
                       <span> {item.quantity}</span>
                       <Button
-                        variant={mode}
                         onClick={() =>
                           updateCartHandler(item, item.quantity + 1)
                         }
+                        variant={mode}
                         disabled={item.quantity === item.countInStock}>
                         <i className='fas fa-plus-circle'></i>
                       </Button>

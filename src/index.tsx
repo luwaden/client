@@ -9,7 +9,7 @@ import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
-import { ContextProvider } from "./Context";
+import { ContextProvider } from "./ContextApi/AppContext";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement

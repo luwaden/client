@@ -3,53 +3,40 @@ import { Button, Form } from "react-bootstrap";
 import { Helmet } from "react-helmet-async";
 import { toast } from "react-toastify";
 import { LoadingBox } from "../components/LoadingBox";
-import { Context } from "../Context";
+import { Context } from "../ContextApi/AppContext";
 import { ApiError } from "../types/ApiError";
 import { getError } from "../utils";
-import apiClient from "../ApiClients";
-import { useSignin } from "../hooks/userSignin"; // Using custom hook
+import { useProfile } from "../hooks/userProfile";
 
 export default function ProfilePage() {
   const { state, dispatch } = useContext(Context);
   const { userInfo } = state;
-  const { isLoading } = useSignin(); // Get loading state
+  const { updateProfile, isLoading } = useProfile();
 
   const [name, setName] = useState(userInfo?.name || "");
   const [email, setEmail] = useState(userInfo?.email || "");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  // Function to handle profile update
-  const updateProfile = async ({
-    name,
-    email,
-    password,
-  }: {
-    name: string;
-    email: string;
-    password?: string;
-  }) => {
-    try {
-      const { data } = await apiClient.put(
-        "/api/profile",
-        { name, email, password },
-        { headers: { Authorization: `Bearer ${userInfo?.token}` } }
-      );
-      return data;
-    } catch (err) {
-      throw getError(err as ApiError);
-    }
-  };
-
   const submitHandler = async (e: React.SyntheticEvent) => {
     e.preventDefault();
-    try {
-      if (password !== confirmPassword) {
-        toast.error("Passwords do not match");
-        return;
-      }
 
-      const updatedUser = await updateProfile({ name, email, password });
+    if (!userInfo) {
+      toast.error("User not logged in");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    try {
+      const updatedUser = await updateProfile(userInfo, {
+        name,
+        email,
+        password: password || undefined,
+      });
 
       dispatch({ type: "USER_SIGNIN", payload: updatedUser });
       localStorage.setItem("userInfo", JSON.stringify(updatedUser));

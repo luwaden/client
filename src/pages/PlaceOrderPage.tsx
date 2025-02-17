@@ -9,10 +9,12 @@ import {
   Card,
   ListGroup,
   ListGroupItem,
+  CardBody,
 } from "react-bootstrap";
-import { Context } from "../Context";
+import { Context } from "../ContextApi/AppContext";
 import { usePlaceOrder } from "../hooks/usePlaceOrder";
 import { LoadingBox } from "../components/LoadingBox";
+import { log } from "console";
 
 export default function PlaceOrderPage() {
   const navigate = useNavigate();
@@ -21,7 +23,7 @@ export default function PlaceOrderPage() {
 
   // 🛠 Fix: Ensure token is properly checked before passing
   const user = JSON.parse(localStorage.getItem("userInfo") || "{}");
-
+  console.log(user);
   const { isLoading, error, success, order, placeOrder } = usePlaceOrder(
     user.data ? user.data : ""
   );
@@ -58,7 +60,7 @@ export default function PlaceOrderPage() {
       <Row>
         <Col md={8}>
           <Card className='mb-3'>
-            <Card.Body>
+            <CardBody>
               <Card.Title>Shipping</Card.Title>
               <ListGroup variant='flush'>
                 <ListGroup.Item>
@@ -68,17 +70,17 @@ export default function PlaceOrderPage() {
                   , {cart.shippingAddress.country}
                 </ListGroup.Item>
               </ListGroup>
-            </Card.Body>
+            </CardBody>
           </Card>
         </Col>
         <Col md={4}>
           <Card>
-            <Card.Body>
+            <CardBody>
               <ListGroup variant='flush'>
-                <ListGroup.Item>
+                <ListGroupItem>
                   <h2>Order Summary</h2>
-                </ListGroup.Item>
-                <ListGroup.Item>
+                </ListGroupItem>
+                <ListGroupItem>
                   <Row>
                     <Col>Items:</Col>
                     <Col>${cart.itemsPrice.toFixed(2)}</Col>
@@ -99,7 +101,7 @@ export default function PlaceOrderPage() {
                       <strong>${cart.totalPrice.toFixed(2)}</strong>
                     </Col>
                   </Row>
-                </ListGroup.Item>
+                </ListGroupItem>
                 <ListGroupItem>
                   {isLoading && <LoadingBox />}
                   <Button
@@ -110,7 +112,7 @@ export default function PlaceOrderPage() {
                   </Button>
                 </ListGroupItem>
               </ListGroup>
-            </Card.Body>
+            </CardBody>
           </Card>
         </Col>
       </Row>

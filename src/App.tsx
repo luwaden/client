@@ -12,6 +12,7 @@ import PaymentMethodPage from "./pages/PaymentMethodPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import OrderPage from "./pages/OrderPage";
 import PlaceOrderPage from "./pages/PlaceOrderPage";
+import ProfilePage from "./pages/ProfilePage";
 
 function App() {
   return (
@@ -23,11 +24,12 @@ function App() {
         <Route path='cart' element={<CartPage />} />
         <Route path='signin' element={<SigninPage />} />
 
+        <Route path='shipping' element={<ShippingAddressPage />} />
+        <Route path='order' element={<OrderPage />} />
+        <Route path='placeOrder' element={<PlaceOrderPage />} />
+        <Route path='payment' element={<PaymentMethodPage />} />
         <Route path='' element={<ProtectedRoute />}>
-          <Route path='shipping' element={<ShippingAddressPage />} />
-          <Route path='order' element={<OrderPage />} />
-          <Route path='placeOrderPage' element={<PlaceOrderPage />} />
-          <Route path='payment' element={<PaymentMethodPage />} />
+          <Route path='profile' element={<ProfilePage />} />
         </Route>
       </Route>
     </Routes>

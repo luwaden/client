@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Context } from "../Context";
+import { Context } from "../ContextApi/AppContext";
 import { Helmet } from "react-helmet-async";
 import CheckoutSteps from "../components/CheckoutSteps";
 import {

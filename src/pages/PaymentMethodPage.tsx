@@ -1,10 +1,11 @@
 import { useNavigate } from "react-router-dom";
 
 import React, { useContext, useEffect, useState } from "react";
-import { Context } from "../Context";
+import { Context } from "../ContextApi/AppContext";
 import CheckoutSteps from "../components/CheckoutSteps";
 import { Helmet } from "react-helmet-async";
 import { Button, Form, FormCheck } from "react-bootstrap";
+import apiClient from "../ApiClients";
 
 const PaymentMethodPage = () => {
   const navigate = useNavigate();
@@ -25,7 +26,7 @@ const PaymentMethodPage = () => {
     e.preventDefault();
     dispatch({ type: "SAVE_PAYMENT_METHOD", payload: paymentMethodName });
     localStorage.setItem("paymentMethod", paymentMethodName);
-    navigate("/placeholder");
+    navigate("/placeOrder");
   };
 
   return (

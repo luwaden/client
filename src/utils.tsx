@@ -2,19 +2,33 @@ import { ApiError } from "./types/ApiError";
 import { CartItem } from "./types/Cart";
 import { Product } from "./types/Product";
 
+import { AxiosError } from "axios";
+
 export const getError = (error: unknown): string => {
   if (typeof error === "string") {
-    return error; // If error is already a string
+    return error; // Direct string error
   }
 
-  if (error && typeof error === "object" && "response" in error) {
-    const apiError = error as ApiError;
-    if (apiError.response?.data?.message) {
-      return apiError.response.data.message; // Extract message from API response
+  if (error instanceof AxiosError) {
+    // Handle Axios errors with a response
+    if (error.response) {
+      return (
+        error.response.data?.message ||
+        `Request failed with status ${error.response.status}`
+      );
+    }
+
+    // Handle Axios network errors
+    if (error.request) {
+      return "Network error: Please check your internet connection.";
     }
   }
 
-  return "An unknown error occurred."; // Fallback message
+  if (error instanceof Error) {
+    return error.message; // Generic JavaScript error
+  }
+
+  return "An unknown error occurred. Please try again later."; // Fallback error message
 };
 
 export const convertProductToCartItem = (product: Product): CartItem => {

@@ -16,9 +16,9 @@ import {
   Row,
 } from "react-bootstrap";
 import Rating from "../components/Rating";
-import { Context } from "../Context";
+import { Context } from "../ContextApi/AppContext";
 import { toast } from "react-toastify";
-import { useProductBySlug } from "../hooks/productHooks";
+import { useProductBySlug } from "../hooks/products/useProductBySlug";
 
 const ProductPage = () => {
   const { slug } = useParams();

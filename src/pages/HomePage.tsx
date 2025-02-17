@@ -5,14 +5,11 @@ import { LoadingBox } from "../components/LoadingBox";
 import { MessageBox } from "../components/MessageBox";
 import ProductItem from "../components/ProductItem";
 import SearchBox from "../components/SearchBox";
-import { useProducts } from "../hooks/productHooks";
+import { useProducts } from "../hooks/products/useProducts";
 
 const HomePage = () => {
-  const { products, isLoading, error } = useProducts();
   const [page, setPage] = useState(1);
-
-  // Dummy Pagination: Assume there are 10 pages max
-  const totalPages = 10;
+  const { products = [], isLoading, totalPages = 1, error } = useProducts(page);
 
   return (
     <Container>
@@ -38,33 +35,50 @@ const HomePage = () => {
         <MessageBox variant='danger'>{error}</MessageBox>
       ) : (
         <>
-          <Row>
-            {/* Featured Products - Stacked */}
-            <Col xs={12} md={6} className='d-flex flex-column'>
-              {products.length > 1 && (
-                <>
-                  <div className='mb-4'>
-                    <ProductItem product={products[0]} isFeatured />
-                  </div>
-                  <div>
-                    <ProductItem product={products[1]} isFeatured />
-                  </div>
-                </>
-              )}
-            </Col>
+          <Row className='product-grid'>
+            {products.length >= 7 && (
+              <>
+                {/* First Column: Two Rows */}
+                <Col xs={12} md={4} className='product-column'>
+                  <Row>
+                    <Col xs={12} className='mb-4'>
+                      <ProductItem product={products[0]} />
+                    </Col>
+                    <Col xs={12} className='mb-5'>
+                      <ProductItem product={products[1]} />
+                    </Col>
+                    <Col xs={12}>
+                      <ProductItem product={products[2]} />
+                    </Col>
+                  </Row>
+                </Col>
 
-            {/* Regular Products Beside Featured Products */}
-            <Col xs={12} md={6}>
-              <Row>
-                {products.slice(2, 6).map((product) => (
-                  <Col key={product.slug} xs={12} md={6} className='mb-4'>
-                    <ProductItem product={product} />
-                  </Col>
-                ))}
-              </Row>
-            </Col>
+                {/* Second Column: Three Rows */}
+                <Col xs={12} md={8} className='product-column'>
+                  <Row>
+                    {/* First Row: Single Wide Product */}
+                    <Col xs={12} className='mb-4'>
+                      <ProductItem product={products[3]} />
+                    </Col>
+                    {/* Second Row: Three Products */}
+                    <Col xs={12} md={4} className='mb-4'>
+                      <ProductItem product={products[4]} />
+                    </Col>
+                    <Col xs={12} md={4} className='mb-4'>
+                      <ProductItem product={products[5]} />
+                    </Col>
+                    <Col xs={12} md={4} className='mb-4'>
+                      <ProductItem product={products[6]} />
+                    </Col>
+                    {/* Third Row: Single Wide Product */}
+                    <Col xs={12}>
+                      <ProductItem product={products[7]} />
+                    </Col>
+                  </Row>
+                </Col>
+              </>
+            )}
           </Row>
-
           {/* Pagination Buttons */}
           <Pagination className='justify-content-center mt-4'>
             {Array.from({ length: totalPages }, (_, i) => (
