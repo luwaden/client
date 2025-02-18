@@ -3,6 +3,7 @@ import axios from "axios";
 import { Context } from "../ContextApi/AppContext";
 import { CartItem } from "../types/Cart";
 import { toast } from "react-toastify";
+import apiClient from "../ApiClients";
 
 export const useCart = () => {
   const { state, dispatch } = useContext(Context);
@@ -19,20 +20,32 @@ export const useCart = () => {
     }
   };
 
-  const addToCart = async (productId: string, quantity: number) => {
+  const addToCart = async (cartItems: CartItem[]) => {
     try {
+      console.log(userInfo);
       const { data } = await axios.post(
-        "/api/cart/add",
-        { userId: userInfo?._id, productId, quantity },
-        { headers: { Authorization: `Bearer ${userInfo?.token}` } }
+        "localhost:5002/api/cart/add",
+        {
+          // userId: userInfo?._id,
+          userId: "67adc3d203c2aaae9362790c",
+
+          items: cartItems.map(({ _id, quantity }) => ({
+            productId: _id,
+            quantity,
+          })),
+        },
+        {
+          headers: { Authorization: `Bearer ${userInfo?.token}` },
+        }
       );
+      toast.success("Cart saved successfully");
       dispatch({ type: "SET_CART", payload: data });
-      toast.success("Product added to cart");
+      return true;
     } catch (error) {
-      toast.error("Failed to add product to cart");
+      toast.error("Failed to save cart");
+      return false;
     }
   };
-
   const updateCart = async (productId: string, quantity: number) => {
     try {
       const { data } = await axios.put(
